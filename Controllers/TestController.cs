@@ -56,6 +56,25 @@ namespace TestTheCoreWebAPI.Controllers
             return result.ToString();
         }
 
+        [HttpPost]
+        [Route("json")]
+        public string PostJSON([FromHeader] string authorization, [FromBody] string jsonBody, string wsURL)
+        {
+            NameValueCollection header = null;
+
+            if (!string.IsNullOrEmpty(authorization))
+            {
+                header = new NameValueCollection
+                {
+                    { "Authorization", authorization }
+                };
+            }
+
+            var result = WebServiceRepo.SubmitJSON<object>(wsURL, HttpVerb.Post, jsonBody, header);
+
+            return result.ToString();
+        }
+
         [HttpGet]
         [Route("demo/mileagePlus/{mileagePlus}")]
         public string GetValues(string mileagePlus)

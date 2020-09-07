@@ -82,6 +82,36 @@ namespace TestTheCoreWebAPI.Models.Repos
             return result;
         }
 
+        public static T SubmitJSON<T>(string wsURL, HttpVerb httpVerb, string jsonBody, NameValueCollection headerData = null)
+        {
+            T result = default;
+
+            var _uri = new Uri(wsURL);
+            var _method = VerbMethod(httpVerb);
+            var _content = new StringContent(jsonBody, Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage() { RequestUri = _uri, Method = _method, Content = _content };
+
+            if (headerData != null)
+            {
+                for (int i = 0; i < headerData.Count; i++)
+                {
+                    request.Headers.Add(headerData.GetKey(i), headerData.Get(i));
+                }
+            }
+
+            using (var response = httpClient.SendAsync(request))
+            {
+                var responseMessage = response.Result;
+                responseMessage.EnsureSuccessStatusCode();
+                var resultData = responseMessage.Content.ReadAsStringAsync().Result;
+
+                result = JsonConvert.DeserializeObject<T>(resultData);
+            }
+
+            return result;
+        }
+
         private static HttpMethod VerbMethod(HttpVerb httpVerb)
         {
             var result = HttpMethod.Get;
