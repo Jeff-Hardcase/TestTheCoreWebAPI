@@ -39,15 +39,15 @@ namespace TestTheCoreWebAPI.Controllers
 
         [HttpPost]
         [Route("response")]
-        public string PostWithHeader([FromHeader] string authorization, [FromBody] LogItem jsonBody, string wsURL)
+        public string PostWithHeader([FromHeader] string AuthToken, [FromBody] LogItem jsonBody, string wsURL)
         {
             NameValueCollection header = null;
 
-            if (!string.IsNullOrEmpty(authorization))
+            if (!string.IsNullOrEmpty(AuthToken))
             {
                 header = new NameValueCollection
                 {
-                    { "Authorization", authorization }
+                    { "Authorization", AuthToken }
                 };
             }
 
@@ -58,19 +58,19 @@ namespace TestTheCoreWebAPI.Controllers
 
         [HttpPost]
         [Route("json")]
-        public string PostJSON([FromHeader] string authorization, [FromBody] string jsonBody, string wsURL)
+        public string PostJSON([FromHeader] string AuthToken, [FromBody] object jsonBody, string wsURL)
         {
             NameValueCollection header = null;
 
-            if (!string.IsNullOrEmpty(authorization))
+            if (!string.IsNullOrEmpty(AuthToken))
             {
                 header = new NameValueCollection
                 {
-                    { "Authorization", authorization }
+                    { "Authorization", AuthToken }
                 };
             }
 
-            var result = WebServiceRepo.SubmitJSON<object>(wsURL, HttpVerb.Post, jsonBody, header);
+            var result = WebServiceRepo.SubmitJSON<object>(wsURL, HttpVerb.Post, jsonBody.ToString(), header);
 
             return result.ToString();
         }
