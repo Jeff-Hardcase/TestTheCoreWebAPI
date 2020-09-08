@@ -36,26 +36,6 @@ namespace TestTheCoreWebAPI.Controllers
             return result.ToString();
         }
 
-
-        [HttpPost]
-        [Route("response")]
-        public string PostWithHeader([FromHeader] string AuthToken, [FromBody] LogItem jsonBody, string wsURL)
-        {
-            NameValueCollection header = null;
-
-            if (!string.IsNullOrEmpty(AuthToken))
-            {
-                header = new NameValueCollection
-                {
-                    { "Authorization", AuthToken }
-                };
-            }
-
-            var result = WebServiceRepo.CallService<object>(wsURL, HttpVerb.Post, jsonBody, header);
-
-            return result.ToString();
-        }
-
         [HttpPost]
         [Route("json")]
         public string PostJSON([FromHeader] string AuthToken, [FromBody] object jsonBody, string wsURL)
