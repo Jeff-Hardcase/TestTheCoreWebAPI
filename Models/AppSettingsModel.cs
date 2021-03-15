@@ -17,11 +17,14 @@ namespace TestTheCoreWebAPI.Models
         public string ServiceName { get; set; }
         public string GetCodes { get; set; }
         public string GetDetailCache { get; set; }
+        public string GeminiPriceBTC { get; set; }
+        public string GeminiPriceETH { get; set; }
     }
 
     public class LocalSettings
     {
         public string ServiceBaseURL { get; set; }
+        public string GeminiHostURL { get; set; }
         public string ConnectionString { get; set; }
         public string[] CorsAllowedSites { get; set; }
         public LoggingConfig LoggingConfig { get; set; }

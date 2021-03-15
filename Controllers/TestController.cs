@@ -1,9 +1,12 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Collections.Specialized;
 using Microsoft.AspNetCore.Mvc;
 using TestTheCoreWebAPI.Models;
-using Microsoft.Extensions.Options;
+using TestTheCoreWebAPI.Models.Domain;
 using TestTheCoreWebAPI.Models.Repos;
+using Microsoft.Extensions.Options;
+
 
 namespace TestTheCoreWebAPI.Controllers
 {
@@ -11,29 +14,39 @@ namespace TestTheCoreWebAPI.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        private IOptions<SettingsModel> __settings { get; set; }
+        private SettingsModel Settings { get; set; }
 
         public TestController(IOptions<SettingsModel> settings)
         {
-            __settings = settings;
+            Settings = settings.Value;
         }
 
         [HttpGet]
         public string Get()
         {
-            var result = JsonSerializer.Serialize(__settings.Value, new JsonSerializerOptions { WriteIndented = true });
+            var result = JsonSerializer.Serialize(Settings, new JsonSerializerOptions { WriteIndented = true });
 
             return result;
         }
 
         [HttpGet]
-        [Route("response")]
-        public string GetResponse()
+        [Route("btc")]
+        public GeminiAssetData GetBTC()
         {
-            var wsURL = "https://api.gemini.com/v1/pubticker/btcusd";
-            var result = WebServiceRepo.CallService<object>(wsURL, HttpVerb.Get);
+            var wsURI = new Uri(new Uri(Settings.LocalSettings.GeminiHostURL), Settings.GlobalSettings.GeminiPriceBTC);
+            var result = WebServiceRepo.CallService<GeminiAssetData>(wsURI.AbsoluteUri, HttpVerb.Get);
 
-            return result.ToString();
+            return result;
+        }
+
+        [HttpGet]
+        [Route("eth")]
+        public GeminiAssetData GetETH()
+        {
+            var wsURI = new Uri(new Uri(Settings.LocalSettings.GeminiHostURL), Settings.GlobalSettings.GeminiPriceETH);
+            var result = WebServiceRepo.CallService<GeminiAssetData>(wsURI.AbsoluteUri, HttpVerb.Get);
+
+            return result;
         }
 
         [HttpPost]
@@ -59,13 +72,12 @@ namespace TestTheCoreWebAPI.Controllers
         [Route("demo/mileagePlus/{mileagePlus}")]
         public string GetValues(string mileagePlus)
         {
-            var globals = __settings.Value.GlobalSettings;
-            var locals = __settings.Value.LocalSettings;
+            var globals = Settings.GlobalSettings;
+            var locals = Settings.LocalSettings;
 
-            var displayResult = "ServiceName = {0} \nGetCodes = {1} \nServiceBaseURL = {2} \nTraceLogging = {3}";
-            var result = string.Format(displayResult, mileagePlus, globals.GetCodes, locals.ServiceBaseURL, locals.LoggingConfig.TraceLogging);
+            var values = $"MileagePlus = {mileagePlus}\nGetCodes = {globals.GetCodes}\nServiceBaseURL = {locals.ServiceBaseURL}\nTraceLogging = {locals.LoggingConfig.TraceLogging}";
 
-            return result;
+            return values;
         }
 
     }
